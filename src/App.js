@@ -21,7 +21,7 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -44,7 +44,7 @@ const App = () => {
   );
 };
 
-const useSemiPersistentState = (key,initialState) => {
+const useSemiPersistentState = (key, initialState) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
@@ -72,10 +72,10 @@ const Item = ({ item }) => (
 
 const Search = ({ onSearch, search }) => {
   return (
-    <div>
+    <>
       <label htmlFor="search">Search: </label>
       <input type="text" id="search" value={search} onChange={onSearch} />
-    </div>
+    </>
   );
 };
 
