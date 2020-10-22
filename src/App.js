@@ -22,14 +22,34 @@ const App = () => {
   ];
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [stories, setStories] = useState(initialStories);
+  const [stories, setStories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  const getAsyncStories = () =>
+    new Promise((resolve) =>
+      setTimeout(() => resolve({ data: { stories: initialStories } }), 2000)
+    );
+
+  React.useEffect(() => {
+    setIsLoading(true);
+
+    getAsyncStories().then((result) => {
+      setStories(result.data.stories);
+      console.log("result.data.stories", result.data.stories);
+      setIsLoading(false);
+    })
+    .catch(() => setIsError(true));
+  }, []);
 
   const handleRemoveStory = (item) => {
+    console.log("item", item);
     const newStories = stories.filter(
       (story) => item.objectID !== story.objectID
     );
 
     setStories(newStories);
+    console.log("item.objectID", item.objectID);
   };
 
   const handleSearch = (event) => {
@@ -52,8 +72,11 @@ const App = () => {
       >
         <strong>Search:</strong>
       </InputWithLabel>
-
-      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      )}
     </div>
   );
 };
@@ -72,13 +95,10 @@ const useSemiPersistentState = (key, initialState) => {
 
 const List = ({ list, onRemoveItem }) =>
   list.map((item) => (
-    <Item key={item.objectID} item={item} onRempveItem={onRemoveItem} />
+    <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
   ));
 
 const Item = ({ item, onRemoveItem }) => {
-  function handleRemoveItem() {
-    onRemoveItem(item);
-  };
   return (
     <div>
       <span>
@@ -88,8 +108,8 @@ const Item = ({ item, onRemoveItem }) => {
       <span>{item.comments}</span>
       <span>{item.points}</span>
       <span>
-        <button type="button" onClick={() => handleRemoveItem(item)}>
-           Dismiss
+        <button type="button" onClick={() => onRemoveItem(item)}>
+          Dismiss
         </button>
       </span>
     </div>
